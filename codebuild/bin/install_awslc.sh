@@ -28,7 +28,8 @@ BUILD_DIR=$1
 INSTALL_DIR=$2
 source codebuild/bin/jobs.sh
 
-cd "/home/ubuntu/bryce-shang/aws-lc"
+cd "$BUILD_DIR"
+git clone --branch rsa-pss https://github.com/awslabs/aws-lc.git
 mkdir build
 cd build
 
