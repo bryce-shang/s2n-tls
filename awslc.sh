@@ -8,5 +8,6 @@ export BUILD_S2N=true
 
 TESTS=integration
 GCC_VERSION=9
-$CB_BIN_DIR/install_default_dependencies.sh
+# $CB_BIN_DIR/install_default_dependencies.sh
+$CB_BIN_DIR/install_awslc.sh "$(mktemp -d)" "./test-deps" > /dev/null ;
 $CB_BIN_DIR/s2n_codebuild.sh
