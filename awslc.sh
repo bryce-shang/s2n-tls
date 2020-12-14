@@ -6,7 +6,6 @@ export CB_BIN_DIR="./codebuild/bin"
 export S2N_LIBCRYPTO="awslc"
 export BUILD_S2N=true
 
-rm nohup.out
 TESTS=integration
 GCC_VERSION=9
 # $CB_BIN_DIR/install_default_dependencies.sh
