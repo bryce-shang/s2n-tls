@@ -29,6 +29,7 @@ INSTALL_DIR=$2
 source codebuild/bin/jobs.sh
 
 cd "/home/ubuntu"
+cd aws-lc && git pull && cd ..
 rm -rf build
 mkdir build
 cd build
