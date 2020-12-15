@@ -55,7 +55,7 @@ if [[ "$OS_NAME" == "linux" && "$TESTS" == "valgrind" ]]; then
 fi
 
 if [[ "$OS_NAME" == "linux" && ( ("$TESTS" == "integration") || ("$TESTS" == "integrationv2") ) ]]; then
-    make -j $JOBS
+    S2N_DEBUG=true make -j $JOBS
 fi
 
 # Build and run unit tests with scan-build for osx. scan-build bundle isn't available for linux
