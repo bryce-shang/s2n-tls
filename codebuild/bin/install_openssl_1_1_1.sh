@@ -32,9 +32,9 @@ source codebuild/bin/jobs.sh
 RELEASE=1_1_1g
 
 cd "$BUILD_DIR"
-curl --retry 3 -L https://github.com/openssl/openssl/archive/OpenSSL_${RELEASE}.zip --output OpenSSL_${RELEASE}.zip
-unzip OpenSSL_${RELEASE}.zip
-cd openssl-OpenSSL_${RELEASE}
+# curl --retry 3 -L https://github.com/openssl/openssl/archive/OpenSSL_${RELEASE}.zip --output OpenSSL_${RELEASE}.zip
+# unzip OpenSSL_${RELEASE}.zip
+cd "/home/ubuntu/bryce-shang/openssl"
 
 if [ "$OS_NAME" == "linux" ]; then
     CONFIGURE="./config -d"
@@ -44,6 +44,9 @@ else
     echo "Invalid platform! $OS_NAME"
     usage
 fi
+
+rm -rf "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR"
 
 # Use g3 to get debug symbols in libcrypto to chase memory leaks
 $CONFIGURE -g3 -fPIC              \

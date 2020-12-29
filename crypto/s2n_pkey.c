@@ -122,9 +122,28 @@ int s2n_pkey_free(struct s2n_pkey *key)
     return S2N_SUCCESS;
 }
 
+void print_array(uint8_t* input, int len) {
+    // int i = 0;
+    // for (i = 0; i < len; i++) {
+    //     printf("0x%02x", input[i]);
+    //     if (i == (len - 1)) {
+    //         printf("\n");
+    //     } else {
+    //         if ((i + 1) % 12 == 0) {
+    //             printf(",\n");
+    //         } else {
+    //             printf(", ");
+    //         }
+    //     }
+    // }
+}
+
 int s2n_asn1der_to_private_key(struct s2n_pkey *priv_key, struct s2n_blob *asn1der)
 {
     uint8_t *key_to_parse = asn1der->data;
+
+
+    // print_array(key_to_parse, asn1der->size);
 
     /* Detect key type */
     DEFER_CLEANUP(EVP_PKEY *evp_private_key = d2i_AutoPrivateKey(NULL, (const unsigned char **)(void *)&key_to_parse, asn1der->size),
@@ -176,6 +195,7 @@ int s2n_asn1der_to_private_key(struct s2n_pkey *priv_key, struct s2n_blob *asn1d
 
 int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *pkey_type_out, struct s2n_blob *asn1der)
 {
+    print_array(asn1der->data, asn1der->size);
     uint8_t *cert_to_parse = asn1der->data;
     DEFER_CLEANUP(X509 *cert = NULL, X509_free_pointer);
 
@@ -229,7 +249,6 @@ int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *
     pub_key->pkey = evp_public_key;
     /* Reset to avoid DEFER_CLEANUP freeing our key */
     evp_public_key = NULL;
-
     return ret;
 }
 

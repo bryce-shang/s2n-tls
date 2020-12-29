@@ -75,8 +75,11 @@ def print_result(result_prefix, return_code):
 
 def do_pq_handshake(client_ciphers, server_ciphers, expected_cipher, expected_kem, host, port):
     s2nd_cmd = ["../../bin/s2nd", "--negotiate", "--ciphers", server_ciphers, host, port]
+    print(s2nd_cmd, sep=" ")
     s2nc_cmd = ["../../bin/s2nc", "-i", "--ciphers", client_ciphers, host, port]
+    print(s2nc_cmd, sep=" ")
     current_dir = os.path.dirname(os.path.realpath(__file__))
+    print(current_dir)
 
     expected_cipher_output = "Cipher negotiated: " + expected_cipher
     expected_kem_output = "KEM: " + expected_kem
@@ -93,6 +96,7 @@ def do_pq_handshake(client_ciphers, server_ciphers, expected_cipher, expected_ke
 
     for i in range(0, NUM_EXPECTED_LINES_OUTPUT):
         client_line = str(s2nc.stdout.readline().decode("utf-8"))
+        print(client_line)
         if expected_kem_output in client_line:
             client_kem_found = True
         if expected_cipher_output in client_line:
@@ -107,6 +111,9 @@ def do_pq_handshake(client_ciphers, server_ciphers, expected_cipher, expected_ke
             server_cipher_found = True
         if validate_version(S2N_TLS12, server_line):
             server_version_correct = True
+
+        if (client_kem_found and client_cipher_found and client_version_correct and server_kem_found and server_cipher_found and server_version_correct):
+            break
 
     s2nc.kill()
     s2nc.wait()

@@ -16,6 +16,7 @@
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "error/s2n_errno.h"
 
@@ -68,7 +69,6 @@ int s2n_rsa_pss_key_sign(const struct s2n_pkey *priv, s2n_signature_algorithm si
 
     /* Not Possible to Sign with Public Key */
     S2N_ERROR_IF(!s2n_rsa_is_private_key(priv->key.rsa_key.rsa), S2N_ERR_KEY_MISMATCH);
-
     return s2n_rsa_pss_sign(priv, digest, signature_out);
 }
 
@@ -86,6 +86,8 @@ int s2n_rsa_pss_key_verify(const struct s2n_pkey *pub, s2n_signature_algorithm s
 
 static int s2n_rsa_pss_validate_sign_verify_match(const struct s2n_pkey *pub, const struct s2n_pkey *priv)
 {
+
+
     /* Generate a random blob to sign and verify */
     s2n_stack_blob(random_data, RSA_PSS_SIGN_VERIFY_RANDOM_BLOB_SIZE, RSA_PSS_SIGN_VERIFY_RANDOM_BLOB_SIZE);
     GUARD_AS_POSIX(s2n_get_private_random_data(&random_data));
@@ -102,6 +104,7 @@ static int s2n_rsa_pss_validate_sign_verify_match(const struct s2n_pkey *pub, co
 
     /* Sign and Verify the Hash of the Random Blob */
     s2n_stack_blob(signature_data, RSA_PSS_SIGN_VERIFY_SIGNATURE_SIZE, RSA_PSS_SIGN_VERIFY_SIGNATURE_SIZE);
+
     GUARD(s2n_rsa_pss_key_sign(priv, S2N_SIGNATURE_RSA_PSS_PSS, &sign_hash, &signature_data));
     GUARD(s2n_rsa_pss_key_verify(pub, S2N_SIGNATURE_RSA_PSS_PSS, &verify_hash, &signature_data));
 
@@ -160,10 +163,13 @@ static int s2n_rsa_pss_keys_match(const struct s2n_pkey *pub, const struct s2n_p
     notnull_check(priv);
     notnull_check(priv->pkey);
 
+
     GUARD(s2n_rsa_validate_params_match(pub, priv));
+
 
     /* Validate that verify(sign(message)) for a random message is verified correctly */
     GUARD(s2n_rsa_pss_validate_sign_verify_match(pub, priv));
+
 
     return 0;
 }

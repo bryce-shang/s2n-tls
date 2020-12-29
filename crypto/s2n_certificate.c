@@ -22,6 +22,7 @@
 #include <openssl/pem.h>
 #include <string.h>
 #include <strings.h>
+#include <stdio.h>
 
 #include "crypto/s2n_certificate.h"
 #include "utils/s2n_array.h"
@@ -334,7 +335,6 @@ int s2n_cert_chain_and_key_load_pem(struct s2n_cert_chain_and_key *chain_and_key
     GUARD(s2n_asn1der_to_public_key_and_type(&public_key, &pkey_type, &chain_and_key->cert_chain->head->raw));
     S2N_ERROR_IF(pkey_type == S2N_PKEY_TYPE_UNKNOWN, S2N_ERR_CERT_TYPE_UNSUPPORTED);
     GUARD(s2n_cert_set_cert_type(chain_and_key->cert_chain->head, pkey_type));
-
     /* Validate the leaf cert's public key matches the provided private key */
     GUARD(s2n_pkey_match(&public_key, chain_and_key->private_key));
 

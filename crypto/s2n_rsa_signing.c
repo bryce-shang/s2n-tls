@@ -147,6 +147,8 @@ int s2n_rsa_pss_sign(const struct s2n_pkey *priv, struct s2n_hash_state *digest,
     const EVP_MD* digest_alg = s2n_hash_alg_to_evp_alg(digest->alg);
     notnull_check(digest_alg);
 
+    notnull_check(priv->pkey);
+
     /* For more info see: https://www.openssl.org/docs/manmaster/man3/EVP_PKEY_sign.html */
     DEFER_CLEANUP(EVP_PKEY_CTX *ctx  = EVP_PKEY_CTX_new(priv->pkey, NULL), s2n_evp_pkey_ctx_free);
     notnull_check(ctx);
