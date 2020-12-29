@@ -142,9 +142,12 @@ int main(int argc, char **argv)
             EXPECT_FAILURE_WITH_ERRNO(rsa_public_key.verify(&rsa_public_key, S2N_SIGNATURE_RSA_PSS_RSAE, &verify_hash, &result),
                     S2N_RSA_PSS_NOT_SUPPORTED);
         } else {
+            printf("debuglc yep rsa_pss supported.\n");
             EXPECT_SUCCESS(rsa_public_key.sign(rsa_cert_chain->private_key, S2N_SIGNATURE_RSA_PSS_RSAE, &sign_hash, &result));
             EXPECT_SUCCESS(rsa_public_key.verify(&rsa_public_key, S2N_SIGNATURE_RSA_PSS_RSAE, &verify_hash, &result));
         }
+
+        printf("debuglc yep free.\n");
 
         EXPECT_SUCCESS(s2n_pkey_free(&rsa_public_key));
     }
@@ -152,6 +155,7 @@ int main(int argc, char **argv)
     #if RSA_PSS_CERTS_SUPPORTED
 
     struct s2n_cert_chain_and_key *rsa_pss_cert_chain;
+    printf("debuglc START\n");
     EXPECT_SUCCESS(s2n_test_cert_chain_and_key_new(&rsa_pss_cert_chain,
             S2N_RSA_PSS_2048_SHA256_LEAF_CERT, S2N_RSA_PSS_2048_SHA256_LEAF_KEY));
 

@@ -105,6 +105,7 @@ int s2n_pkey_match(const struct s2n_pkey *pub_key, const struct s2n_pkey *priv_k
 
     S2N_ERROR_IF(pub_key->match != priv_key->match, S2N_ERR_KEY_MISMATCH);
 
+    printf("debuglc s2n_pkey_match!\n");
     return pub_key->match(pub_key, priv_key);
 }
 
@@ -122,9 +123,29 @@ int s2n_pkey_free(struct s2n_pkey *key)
     return S2N_SUCCESS;
 }
 
+void print_array(uint8_t* input, int len) {
+    // int i = 0;
+    // for (i = 0; i < len; i++) {
+    //     printf("0x%02x", input[i]);
+    //     if (i == (len - 1)) {
+    //         printf("\n");
+    //     } else {
+    //         if ((i + 1) % 12 == 0) {
+    //             printf(",\n");
+    //         } else {
+    //             printf(", ");
+    //         }
+    //     }
+    // }
+}
+
 int s2n_asn1der_to_private_key(struct s2n_pkey *priv_key, struct s2n_blob *asn1der)
 {
     uint8_t *key_to_parse = asn1der->data;
+
+    printf("debuglc print_array %d\n", asn1der->size);
+
+    // print_array(key_to_parse, asn1der->size);
 
     /* Detect key type */
     DEFER_CLEANUP(EVP_PKEY *evp_private_key = d2i_AutoPrivateKey(NULL, (const unsigned char **)(void *)&key_to_parse, asn1der->size),
@@ -176,6 +197,8 @@ int s2n_asn1der_to_private_key(struct s2n_pkey *priv_key, struct s2n_blob *asn1d
 
 int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *pkey_type_out, struct s2n_blob *asn1der)
 {
+    printf("debuglc public key start ===\n");
+    print_array(asn1der->data, asn1der->size);
     uint8_t *cert_to_parse = asn1der->data;
     DEFER_CLEANUP(X509 *cert = NULL, X509_free_pointer);
 
@@ -195,6 +218,7 @@ int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *
 
     /* Check for success in decoding certificate according to type */
     int type = EVP_PKEY_base_id(evp_public_key);
+    printf("debuglc public key type %d\n", type);
 
     int ret;
     switch (type) {
@@ -209,8 +233,10 @@ int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *
     case EVP_PKEY_RSA_PSS:
         ret = s2n_rsa_pss_pkey_init(pub_key);
         if (ret != 0) {
+            printf("debuglc is break public key?\n");
             break;
         }
+        printf("debuglc is break public key -- no\n");
         ret = s2n_evp_pkey_to_rsa_pss_public_key(&pub_key->key.rsa_key, evp_public_key);
         *pkey_type_out = S2N_PKEY_TYPE_RSA_PSS;
         break;
@@ -229,7 +255,7 @@ int s2n_asn1der_to_public_key_and_type(struct s2n_pkey *pub_key, s2n_pkey_type *
     pub_key->pkey = evp_public_key;
     /* Reset to avoid DEFER_CLEANUP freeing our key */
     evp_public_key = NULL;
-
+    printf("debuglc public key end ===\n");
     return ret;
 }
 

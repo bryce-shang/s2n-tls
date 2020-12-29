@@ -57,13 +57,13 @@ class Result:
     def __str__(self):
         result = str(self.status)
         if self.error_msg:
-            result += "\n\t" + with_color(self.error_msg, Color.RED)
+            result += "\n\t" + str(with_color(self.error_msg, Color.RED))
             if self.client_error:
-                result += with_color("\n\tClient: ", Color.RED)
-                result += self.client_error.rstrip()
+                result += str(with_color("\n\tClient: ", Color.RED))
+                result += str(self.client_error.rstrip())
             if self.server_error:
-                result += with_color("\n\tServer: ", Color.RED)
-                result += self.server_error.rstrip()
+                result += str(with_color("\n\tServer: ", Color.RED))
+                result += str(self.server_error.rstrip())
 
         return result
 

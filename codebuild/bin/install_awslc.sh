@@ -28,14 +28,12 @@ BUILD_DIR=$1
 INSTALL_DIR=$2
 source codebuild/bin/jobs.sh
 
-cd "/home/ubuntu"
-cd aws-lc && git pull && cd ..
-rm -rf build
-mkdir build
-cd build
+rm -rf /home/ubuntu/build
+mkdir /home/ubuntu/build
+cd /home/ubuntu/build
 
-cmake ../aws-lc -GNinja -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-ninja -v -j "${JOBS}" install
+cmake /home/ubuntu/bryce-shang/aws-lc -GNinja -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+ninja -j "${JOBS}" install
 
 popd
 
