@@ -15,6 +15,8 @@
 
 #pragma once
 
-/* For clarity of the code. */
-#define IN
-#define OUT
+#include "tls/extensions/s2n_extension_type.h"
+#include "tls/s2n_connection.h"
+#include "stuffer/s2n_stuffer.h"
+
+extern const s2n_extension_type s2n_psk_key_exchange_modes_extension;

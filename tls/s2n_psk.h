@@ -27,11 +27,17 @@ typedef enum {
     S2N_PSK_TYPE_EXTERNAL,
 } s2n_psk_type;
 
+typedef enum {
+    S2N_PSK_KE_UNKNOWN = 0,
+    S2N_PSK_KE,
+    S2N_PSK_DHE_KE,
+} s2n_psk_key_exchange_mode;
+
 struct s2n_psk {
     s2n_psk_type type;
     struct s2n_blob identity;
     struct s2n_blob secret;
-    s2n_hash_algorithm hash_alg;
+    s2n_hmac_algorithm hmac_alg;
     uint32_t obfuscated_ticket_age;
     struct s2n_blob early_secret;
 };
@@ -41,6 +47,7 @@ struct s2n_psk_parameters {
     uint16_t binder_list_size;
     uint8_t chosen_psk_wire_index;
     struct s2n_psk *chosen_psk;
+    s2n_psk_key_exchange_mode psk_ke_mode;
 };
 
 int s2n_psk_init(struct s2n_psk *psk, s2n_psk_type type);
@@ -55,7 +62,7 @@ int s2n_psk_parameters_free(struct s2n_psk_parameters *params);
 
 S2N_RESULT s2n_finish_psk_extension(struct s2n_connection *conn);
 
-int s2n_psk_calculate_binder_hash(struct s2n_connection *conn, s2n_hash_algorithm hash_alg,
+int s2n_psk_calculate_binder_hash(struct s2n_connection *conn, s2n_hmac_algorithm hmac_alg,
         const struct s2n_blob *partial_client_hello, struct s2n_blob *output_binder_hash);
 int s2n_psk_calculate_binder(struct s2n_psk *psk, const struct s2n_blob *binder_hash,
         struct s2n_blob *output_binder);
