@@ -69,7 +69,6 @@ int s2n_rsa_pss_key_sign(const struct s2n_pkey *priv, s2n_signature_algorithm si
 
     /* Not Possible to Sign with Public Key */
     S2N_ERROR_IF(!s2n_rsa_is_private_key(priv->key.rsa_key.rsa), S2N_ERR_KEY_MISMATCH);
-    printf("debuglc s2n_rsa_pss_sign\n");
     return s2n_rsa_pss_sign(priv, digest, signature_out);
 }
 
@@ -164,16 +163,13 @@ static int s2n_rsa_pss_keys_match(const struct s2n_pkey *pub, const struct s2n_p
     notnull_check(priv);
     notnull_check(priv->pkey);
 
-    printf("debuglc s2n_rsa_pss_keys_match 1\n");
 
     GUARD(s2n_rsa_validate_params_match(pub, priv));
 
-    printf("debuglc s2n_rsa_pss_keys_match 2\n");
 
     /* Validate that verify(sign(message)) for a random message is verified correctly */
     GUARD(s2n_rsa_pss_validate_sign_verify_match(pub, priv));
 
-    printf("debuglc s2n_rsa_pss_keys_match 3\n");
 
     return 0;
 }
@@ -225,7 +221,6 @@ int s2n_rsa_pss_pkey_init(struct s2n_pkey *pkey)
     pkey->encrypt = NULL; /* No function for encryption */
     pkey->decrypt = NULL; /* No function for decryption */
 
-    printf("debuglc got match!\n");
     pkey->match = &s2n_rsa_pss_keys_match;
     pkey->free = &s2n_rsa_pss_key_free;
 

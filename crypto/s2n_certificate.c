@@ -332,19 +332,15 @@ int s2n_cert_chain_and_key_load_pem(struct s2n_cert_chain_and_key *chain_and_key
     /* Parse the leaf cert for the public key and certificate type */
     DEFER_CLEANUP(struct s2n_pkey public_key = {0}, s2n_pkey_free);
     s2n_pkey_type pkey_type = S2N_PKEY_TYPE_UNKNOWN;
-    printf("debuglc s2n_cert_chain_and_key_load_pem 1!\n");
     GUARD(s2n_asn1der_to_public_key_and_type(&public_key, &pkey_type, &chain_and_key->cert_chain->head->raw));
     S2N_ERROR_IF(pkey_type == S2N_PKEY_TYPE_UNKNOWN, S2N_ERR_CERT_TYPE_UNSUPPORTED);
     GUARD(s2n_cert_set_cert_type(chain_and_key->cert_chain->head, pkey_type));
-    printf("debuglc s2n_cert_chain_and_key_load_pem 2!\n");
     /* Validate the leaf cert's public key matches the provided private key */
     GUARD(s2n_pkey_match(&public_key, chain_and_key->private_key));
 
-    printf("debuglc s2n_cert_chain_and_key_load_pem 3!\n");
     /* Populate name information from the SAN/CN for the leaf certificate */
     GUARD(s2n_cert_chain_and_key_set_names(chain_and_key, &chain_and_key->cert_chain->head->raw));
 
-    printf("debuglc s2n_cert_chain_and_key_load_pem 4!\n");
     return 0;
 }
 
