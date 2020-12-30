@@ -337,94 +337,94 @@ int main(int argc, char **argv)
             EXPECT_SUCCESS(s2n_config_free(client_config));
         }
 
-        // /*  Test: RSA cert with RSA PSS signatures */
-        // if (s2n_is_rsa_pss_signing_supported())
-        // {
-        //     printf("yes shanggu s2n_is_rsa_pss_signing_supported.");
-        //     const struct s2n_signature_scheme* const rsa_pss_rsae_sig_schemes[] = {
-        //             /* RSA PSS */
-        //             &s2n_rsa_pss_rsae_sha256,
-        //             &s2n_rsa_pss_rsae_sha384,
-        //             &s2n_rsa_pss_rsae_sha512,
-        //     };
+        /*  Test: RSA cert with RSA PSS signatures */
+        if (s2n_is_rsa_pss_signing_supported())
+        {
+            printf("yes shanggu s2n_is_rsa_pss_signing_supported.");
+            const struct s2n_signature_scheme* const rsa_pss_rsae_sig_schemes[] = {
+                    /* RSA PSS */
+                    &s2n_rsa_pss_rsae_sha256,
+                    &s2n_rsa_pss_rsae_sha384,
+                    &s2n_rsa_pss_rsae_sha512,
+            };
 
-        //     struct s2n_signature_preferences sig_prefs = {
-        //         .count = 3,
-        //         .signature_schemes = rsa_pss_rsae_sig_schemes,
-        //     };
+            struct s2n_signature_preferences sig_prefs = {
+                .count = 3,
+                .signature_schemes = rsa_pss_rsae_sig_schemes,
+            };
 
-        //     struct s2n_config *server_config, *client_config;
+            struct s2n_config *server_config, *client_config;
 
-        //     struct s2n_cert_chain_and_key *chain_and_key;
-        //     EXPECT_SUCCESS(s2n_test_cert_chain_and_key_new(&chain_and_key,
-        //             S2N_DEFAULT_TEST_CERT_CHAIN, S2N_DEFAULT_TEST_PRIVATE_KEY));
+            struct s2n_cert_chain_and_key *chain_and_key;
+            EXPECT_SUCCESS(s2n_test_cert_chain_and_key_new(&chain_and_key,
+                    S2N_DEFAULT_TEST_CERT_CHAIN, S2N_DEFAULT_TEST_PRIVATE_KEY));
 
-        //     EXPECT_NOT_NULL(server_config = s2n_config_new());
+            EXPECT_NOT_NULL(server_config = s2n_config_new());
 
-        //     struct s2n_security_policy security_policy = {
-        //         .minimum_protocol_version = server_config->security_policy->minimum_protocol_version,
-        //         .cipher_preferences = server_config->security_policy->cipher_preferences,
-        //         .kem_preferences = server_config->security_policy->kem_preferences,
-        //         .signature_preferences = &sig_prefs,
-        //         .ecc_preferences = server_config->security_policy->ecc_preferences,
-        //     };
+            struct s2n_security_policy security_policy = {
+                .minimum_protocol_version = server_config->security_policy->minimum_protocol_version,
+                .cipher_preferences = server_config->security_policy->cipher_preferences,
+                .kem_preferences = server_config->security_policy->kem_preferences,
+                .signature_preferences = &sig_prefs,
+                .ecc_preferences = server_config->security_policy->ecc_preferences,
+            };
 
-        //     EXPECT_SUCCESS(s2n_config_add_cert_chain_and_key_to_store(server_config, chain_and_key));
-        //     EXPECT_SUCCESS(s2n_config_add_dhparams(server_config, dhparams_pem));
-        //     if (test_type == TEST_TYPE_ASYNC) {
-        //         EXPECT_SUCCESS(s2n_config_set_async_pkey_callback(server_config, async_pkey_fn));
-        //     }
-        //     server_config->security_policy = &security_policy;
+            EXPECT_SUCCESS(s2n_config_add_cert_chain_and_key_to_store(server_config, chain_and_key));
+            EXPECT_SUCCESS(s2n_config_add_dhparams(server_config, dhparams_pem));
+            if (test_type == TEST_TYPE_ASYNC) {
+                EXPECT_SUCCESS(s2n_config_set_async_pkey_callback(server_config, async_pkey_fn));
+            }
+            server_config->security_policy = &security_policy;
 
-        //     EXPECT_NOT_NULL(client_config = s2n_config_new());
-        //     client_config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
-        //     client_config->check_ocsp = 0;
-        //     client_config->disable_x509_validation = 1;
-        //     client_config->security_policy = &security_policy;
+            EXPECT_NOT_NULL(client_config = s2n_config_new());
+            client_config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
+            client_config->check_ocsp = 0;
+            client_config->disable_x509_validation = 1;
+            client_config->security_policy = &security_policy;
 
-        //     EXPECT_SUCCESS(s2n_config_set_verification_ca_location(client_config, S2N_DEFAULT_TEST_CERT_CHAIN, NULL));
+            EXPECT_SUCCESS(s2n_config_set_verification_ca_location(client_config, S2N_DEFAULT_TEST_CERT_CHAIN, NULL));
 
-        //     EXPECT_SUCCESS(test_cipher_preferences(server_config, client_config,
-        //             chain_and_key, S2N_SIGNATURE_RSA_PSS_RSAE));
+            EXPECT_SUCCESS(test_cipher_preferences(server_config, client_config,
+                    chain_and_key, S2N_SIGNATURE_RSA_PSS_RSAE));
 
-        //     EXPECT_SUCCESS(s2n_cert_chain_and_key_free(chain_and_key));
-        //     EXPECT_SUCCESS(s2n_config_free(server_config));
-        //     EXPECT_SUCCESS(s2n_config_free(client_config));
-        // }
+            EXPECT_SUCCESS(s2n_cert_chain_and_key_free(chain_and_key));
+            EXPECT_SUCCESS(s2n_config_free(server_config));
+            EXPECT_SUCCESS(s2n_config_free(client_config));
+        }
 
-        // /*  Test: RSA_PSS cert with RSA_PSS signatures */
-        // if (s2n_is_rsa_pss_certs_supported())
-        // {
-        //     s2n_enable_tls13();
+        /*  Test: RSA_PSS cert with RSA_PSS signatures */
+        if (s2n_is_rsa_pss_certs_supported())
+        {
+            s2n_enable_tls13();
 
-        //     struct s2n_config *server_config, *client_config;
+            struct s2n_config *server_config, *client_config;
 
-        //     struct s2n_cert_chain_and_key *chain_and_key;
-        //     EXPECT_SUCCESS(s2n_test_cert_chain_and_key_new(&chain_and_key,
-        //             S2N_RSA_PSS_2048_SHA256_LEAF_CERT, S2N_RSA_PSS_2048_SHA256_LEAF_KEY));
+            struct s2n_cert_chain_and_key *chain_and_key;
+            EXPECT_SUCCESS(s2n_test_cert_chain_and_key_new(&chain_and_key,
+                    S2N_RSA_PSS_2048_SHA256_LEAF_CERT, S2N_RSA_PSS_2048_SHA256_LEAF_KEY));
 
-        //     EXPECT_NOT_NULL(server_config = s2n_config_new());
-        //     EXPECT_SUCCESS(s2n_config_set_cipher_preferences(server_config, "20200207"));
-        //     EXPECT_SUCCESS(s2n_config_add_cert_chain_and_key_to_store(server_config, chain_and_key));
-        //     if (test_type == TEST_TYPE_ASYNC) {
-        //         EXPECT_SUCCESS(s2n_config_set_async_pkey_callback(server_config, async_pkey_fn));
-        //     }
+            EXPECT_NOT_NULL(server_config = s2n_config_new());
+            EXPECT_SUCCESS(s2n_config_set_cipher_preferences(server_config, "20200207"));
+            EXPECT_SUCCESS(s2n_config_add_cert_chain_and_key_to_store(server_config, chain_and_key));
+            if (test_type == TEST_TYPE_ASYNC) {
+                EXPECT_SUCCESS(s2n_config_set_async_pkey_callback(server_config, async_pkey_fn));
+            }
 
-        //     EXPECT_NOT_NULL(client_config = s2n_config_new());
-        //     EXPECT_SUCCESS(s2n_config_set_cipher_preferences(client_config, "20200207"));
-        //     client_config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
-        //     client_config->check_ocsp = 0;
-        //     client_config->disable_x509_validation = 1;
+            EXPECT_NOT_NULL(client_config = s2n_config_new());
+            EXPECT_SUCCESS(s2n_config_set_cipher_preferences(client_config, "20200207"));
+            client_config->client_cert_auth_type = S2N_CERT_AUTH_NONE;
+            client_config->check_ocsp = 0;
+            client_config->disable_x509_validation = 1;
 
-        //     EXPECT_SUCCESS(test_cipher_preferences(server_config, client_config,
-        //             chain_and_key, S2N_SIGNATURE_RSA_PSS_PSS));
+            EXPECT_SUCCESS(test_cipher_preferences(server_config, client_config,
+                    chain_and_key, S2N_SIGNATURE_RSA_PSS_PSS));
 
-        //     EXPECT_SUCCESS(s2n_cert_chain_and_key_free(chain_and_key));
-        //     EXPECT_SUCCESS(s2n_config_free(server_config));
-        //     EXPECT_SUCCESS(s2n_config_free(client_config));
+            EXPECT_SUCCESS(s2n_cert_chain_and_key_free(chain_and_key));
+            EXPECT_SUCCESS(s2n_config_free(server_config));
+            EXPECT_SUCCESS(s2n_config_free(client_config));
 
-        //     s2n_disable_tls13();
-        // }
+            s2n_disable_tls13();
+        }
     }
 
     END_TEST();
