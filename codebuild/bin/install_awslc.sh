@@ -29,7 +29,8 @@ INSTALL_DIR=$2
 source codebuild/bin/jobs.sh
 
 cd "$BUILD_DIR"
-git clone https://github.com/awslabs/aws-lc.git
+git clone https://github.com/bryce-shang/aws-lc.git
+(cd aws-lc && git checkout psstest)
 mkdir build
 cd build
 
