@@ -28,12 +28,11 @@ BUILD_DIR=$1
 INSTALL_DIR=$2
 source codebuild/bin/jobs.sh
 
-cd "$BUILD_DIR"
-git clone https://github.com/awslabs/aws-lc.git
-mkdir build
-cd build
+rm -rf /home/ubuntu/build
+mkdir /home/ubuntu/build
+cd /home/ubuntu/build
 
-cmake ../aws-lc -GNinja -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+cmake /home/ubuntu/bryce-shang/aws-lc -GNinja -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
 ninja -j "${JOBS}" install
 
 popd
