@@ -101,7 +101,13 @@ static int benchmark_recv_single_suite_server(benchmark::State& state) {
 }
 
 int start_benchmark_recv_server(int argc, char **argv) {
+
+#if defined(BENCH_TLS13)
+    const char *cipher_prefs = "test_all_tls13";
+#else
     const char *cipher_prefs = "test_all_tls12";
+#endif
+
     struct addrinfo hints = {};
     struct addrinfo *ai;
     conn_settings = {0};
@@ -121,7 +127,8 @@ int start_benchmark_recv_server(int argc, char **argv) {
                    gb_options, data_sizes);
 
     if(data_sizes.size() == 0) {
-        data_sizes = { 1, 100, 1000, 10000, 100000, 1000000 };
+        // Must be synchronised with corresponding list in s2n_client_send_benchmark.cc
+        data_sizes = { 100, 10000, 1000000 };
     }
 
     std::string log_output_name = "server_" + file_prefix;
@@ -171,12 +178,14 @@ int start_benchmark_recv_server(int argc, char **argv) {
 
     s2n_set_common_server_config(max_early_data, config, conn_settings, cipher_prefs, session_ticket_key_file_path);
 
+#if !defined(BENCH_TLS13)
     struct s2n_cert_chain_and_key *chain_and_key_rsa = s2n_cert_chain_and_key_new();
     GUARD_EXIT(s2n_cert_chain_and_key_load_pem(chain_and_key_rsa, rsa_certificate_chain, rsa_private_key),
                "Error loading RSA certificate/key");
 
     GUARD_EXIT(s2n_config_add_cert_chain_and_key_to_store(config, chain_and_key_rsa),
                "Error adding RSA chain and key");
+#endif
 
     struct s2n_cert_chain_and_key *chain_and_key_ecdsa = s2n_cert_chain_and_key_new();
     GUARD_EXIT(s2n_cert_chain_and_key_load_pem(chain_and_key_ecdsa, ecdsa_certificate_chain, ecdsa_private_key),
