@@ -100,14 +100,25 @@ static void benchmark_single_suite_client(benchmark::State& state) {
             cipher_suites_benchmark, /* suites */
     };
 
+#if defined(BENCH_TLS13)
     const struct s2n_security_policy security_policy_benchmark = {
-            S2N_SSLv3, /* minimum_protocol_version */
-            &cipher_preferences_benchmark, /* cipher_preferences */
-            &kem_preferences_kms_pq_tls_1_0_2020_07, /* kem_preferences */
-            &s2n_signature_preferences_20201021, /* signature_preferences */
-            NULL, /* certificate_signature_preferences */
-            &s2n_ecc_preferences_20201021, /* ecc_preferences */
+            S2N_SSLv3,
+            &cipher_preferences_benchmark,
+            &kem_preferences_null,
+            &s2n_signature_preferences_20201021,
+            NULL,
+            &s2n_ecc_preferences_20200310,
     };
+#else
+    const struct s2n_security_policy security_policy_benchmark = {
+            S2N_TLS10,
+            &cipher_preferences_benchmark,
+            &kem_preferences_kms_pq_tls_1_0_2020_07,
+            &s2n_signature_preferences_20201021,
+            NULL,
+            &s2n_ecc_preferences_20201021,
+    };
+#endif
 
     config->security_policy = &security_policy_benchmark;
 

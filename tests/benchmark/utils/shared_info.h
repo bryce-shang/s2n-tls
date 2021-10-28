@@ -38,3 +38,5 @@ int benchmark_negotiate(struct s2n_connection *conn, int fd, benchmark::State& s
 void argument_parse(int argc, char** argv, int& use_corked_io, int& insecure, char* bench_format,
                     std::string& file_prefix, long int& warmup_iters, size_t& iterations, size_t& repetitions,
                     std::string& gb_options, std::vector<int> &data_sizes);
+
+//#define BENCH_TLS13 1

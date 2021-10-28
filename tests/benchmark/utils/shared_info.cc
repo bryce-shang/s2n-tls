@@ -19,8 +19,18 @@ extern "C" {
 #include "bin/common.h"
 }
 
+#if defined(BENCH_TLS13)
+
+struct s2n_cipher_suite **all_suites = cipher_preferences_test_all_tls13.suites;
+unsigned int num_suites = cipher_preferences_test_all_tls13.count;
+
+#else
+
 struct s2n_cipher_suite **all_suites = cipher_preferences_test_all_tls12.suites;
 unsigned int num_suites = cipher_preferences_test_all_tls12.count;
+
+#endif
+
 const char *host = "localhost";
 const char *port = "8000";
 char const *pem_dir = "";
