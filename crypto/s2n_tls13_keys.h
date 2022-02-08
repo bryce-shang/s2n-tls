@@ -27,6 +27,12 @@
 #include "utils/s2n_mem.h"
 #include "utils/s2n_safety.h"
 
+/* Unlike TLS1.2 secrets, TLS1.3 secret lengths vary depending
+ * on the hash algorithm used to calculate them.
+ * We allocate enough space for the largest possible secret.
+ * At the moment, that is 48 bytes for S2N_HASH_SHA384 and
+ * matches the TLS1.2 secret length.
+ */
 #define S2N_TLS13_SECRET_MAX_LEN SHA384_DIGEST_LENGTH
 
 struct s2n_tls13_keys {
@@ -77,10 +83,11 @@ int s2n_tls13_derive_binder_key(struct s2n_tls13_keys *keys, struct s2n_psk *psk
 int s2n_tls13_derive_early_secret(struct s2n_tls13_keys *handshake, struct s2n_psk *psk);
 int s2n_tls13_derive_early_traffic_secret(struct s2n_tls13_keys *keys, struct s2n_hash_state *client_hello_hash, struct s2n_blob *secret);
 int s2n_tls13_extract_handshake_secret(struct s2n_tls13_keys *keys, const struct s2n_blob *ecdhe);
-int s2n_tls13_derive_handshake_traffic_secret(struct s2n_tls13_keys *keys, struct s2n_hash_state *client_server_hello_hash,
+int s2n_tls13_derive_handshake_traffic_secret(struct s2n_tls13_keys *keys, struct s2n_blob *server_hello_digest,
         struct s2n_blob *secret, s2n_mode mode);
 int s2n_tls13_extract_master_secret(struct s2n_tls13_keys *handshake);
-int s2n_tls13_derive_application_secret(struct s2n_tls13_keys *handshake, struct s2n_hash_state *hashes, struct s2n_blob *secret_blob, s2n_mode mode);
+int s2n_tls13_derive_application_secret(struct s2n_tls13_keys *handshake, struct s2n_blob *server_finished_digest,
+        struct s2n_blob *secret_blob, s2n_mode mode);
 
 int s2n_tls13_derive_traffic_keys(struct s2n_tls13_keys *handshake, struct s2n_blob *secret, struct s2n_blob *key, struct s2n_blob *iv);
 int s2n_tls13_derive_finished_key(struct s2n_tls13_keys *keys, struct s2n_blob *secret_key, struct s2n_blob *output_finish_key);

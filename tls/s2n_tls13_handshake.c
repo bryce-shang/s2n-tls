@@ -60,8 +60,8 @@ static int s2n_tls13_keys_init_with_ref(struct s2n_tls13_keys *handshake, s2n_hm
 
 int s2n_tls13_keys_from_conn(struct s2n_tls13_keys *keys, struct s2n_connection *conn)
 {
-    POSIX_GUARD(s2n_tls13_keys_init_with_ref(keys, conn->secure.cipher_suite->prf_alg, conn->secrets.rsa_premaster_secret, conn->secrets.master_secret));
-
+    POSIX_GUARD(s2n_tls13_keys_init_with_ref(keys, conn->secure.cipher_suite->prf_alg,
+            conn->secrets.tls13.extracted_secret, conn->secrets.tls13.derived_secret));
     return S2N_SUCCESS;
 }
 
@@ -268,6 +268,10 @@ int s2n_tls13_handle_handshake_traffic_secret(struct s2n_connection *conn, s2n_m
     s2n_tls13_connection_keys(secrets, conn);
     bool is_sending_secret = (mode == conn->mode);
 
+    struct s2n_blob message_digest = { 0 };
+    POSIX_ENSURE_REF(conn->handshake.hashes);
+    POSIX_GUARD(s2n_blob_init(&message_digest, conn->handshake.hashes->server_hello_digest, secrets.size));
+
     /* produce handshake secret */
     s2n_stack_blob(hs_secret, secrets.size, S2N_TLS13_SECRET_MAX_LEN);
 
@@ -293,8 +297,7 @@ int s2n_tls13_handle_handshake_traffic_secret(struct s2n_connection *conn, s2n_m
         conn->server = &conn->secure;
     }
 
-    POSIX_ENSURE_REF(conn->handshake.hashes);
-    POSIX_GUARD(s2n_tls13_derive_handshake_traffic_secret(&secrets, &conn->handshake.hashes->server_hello_copy, &hs_secret, mode));
+    POSIX_GUARD(s2n_tls13_derive_handshake_traffic_secret(&secrets, &message_digest, &hs_secret, mode));
 
     /* trigger secret callbacks */
     if (conn->secret_cb && s2n_connection_is_quic_enabled(conn)) {
@@ -337,28 +340,28 @@ static int s2n_tls13_handle_application_secret(struct s2n_connection *conn, s2n_
     s2n_tls13_connection_keys(keys, conn);
     bool is_sending_secret = (mode == conn->mode);
 
+    struct s2n_blob message_digest = { 0 };
+    POSIX_ENSURE_REF(conn->handshake.hashes);
+    POSIX_GUARD(s2n_blob_init(&message_digest, conn->handshake.hashes->server_finished_digest, keys.size));
+
     uint8_t *app_secret_data, *implicit_iv_data;
     struct s2n_session_key *session_key;
     s2n_secret_type_t secret_type;
     if (mode == S2N_CLIENT) {
-        app_secret_data = conn->secrets.client_app_secret;
+        app_secret_data = conn->secrets.tls13.client_app_secret;
         implicit_iv_data = conn->secure.client_implicit_iv;
         session_key = &conn->secure.client_key;
         secret_type = S2N_CLIENT_APPLICATION_TRAFFIC_SECRET;
     } else {
-        app_secret_data = conn->secrets.server_app_secret;
+        app_secret_data = conn->secrets.tls13.server_app_secret;
         implicit_iv_data = conn->secure.server_implicit_iv;
         session_key = &conn->secure.server_key;
         secret_type = S2N_SERVER_APPLICATION_TRAFFIC_SECRET;
     }
 
-    /* use frozen hashes during the server finished state */
-    POSIX_ENSURE_REF(conn->handshake.hashes);
-    struct s2n_hash_state *hash_state = &conn->handshake.hashes->server_finished_copy;
-
     /* calculate secret */
     struct s2n_blob app_secret = { .data = app_secret_data, .size = keys.size };
-    POSIX_GUARD(s2n_tls13_derive_application_secret(&keys, hash_state, &app_secret, mode));
+    POSIX_GUARD(s2n_tls13_derive_application_secret(&keys, &message_digest, &app_secret, mode));
 
     /* trigger secret callback */
     if (conn->secret_cb && s2n_connection_is_quic_enabled(conn)) {
@@ -409,7 +412,7 @@ static int s2n_tls13_handle_resumption_master_secret(struct s2n_connection *conn
     POSIX_GUARD(s2n_handshake_get_hash_state(conn, keys.hash_algorithm, &hash_state));
     
     struct s2n_blob resumption_master_secret = {0};
-    POSIX_GUARD(s2n_blob_init(&resumption_master_secret, conn->resumption_master_secret, keys.size));
+    POSIX_GUARD(s2n_blob_init(&resumption_master_secret, conn->secrets.tls13.resumption_master_secret, keys.size));
     POSIX_GUARD(s2n_tls13_derive_resumption_master_secret(&keys, &hash_state, &resumption_master_secret));
     return S2N_SUCCESS;
 }
@@ -522,11 +525,11 @@ int s2n_update_application_traffic_keys(struct s2n_connection *conn, s2n_mode mo
 
     if (mode == S2N_CLIENT) {
         old_key = &conn->secure.client_key;
-        POSIX_GUARD(s2n_blob_init(&old_app_secret, conn->secrets.client_app_secret, keys.size));
+        POSIX_GUARD(s2n_blob_init(&old_app_secret, conn->secrets.tls13.client_app_secret, keys.size));
         POSIX_GUARD(s2n_blob_init(&app_iv, conn->secure.client_implicit_iv, S2N_TLS13_FIXED_IV_LEN));
     } else {
         old_key = &conn->secure.server_key;
-        POSIX_GUARD(s2n_blob_init(&old_app_secret, conn->secrets.server_app_secret, keys.size));
+        POSIX_GUARD(s2n_blob_init(&old_app_secret, conn->secrets.tls13.server_app_secret, keys.size));
         POSIX_GUARD(s2n_blob_init(&app_iv, conn->secure.server_implicit_iv, S2N_TLS13_FIXED_IV_LEN));  
     }
 

@@ -25,6 +25,7 @@
 #include "error/s2n_errno.h"
 #include "utils/s2n_safety.h"
 #include "utils/s2n_result.h"
+#include "tls/s2n_alerts.h"
 #include "tls/s2n_tls13.h"
 
 int test_count;
@@ -138,6 +139,15 @@ int test_count;
         RESET_ERRNO(); \
     } while(0)
 
+#define EXPECT_FAILURE_WITH_ALERT( function_call, err, alert ) \
+    do { \
+        EXPECT_FAILURE_WITH_ERRNO_NO_RESET(function_call, err); \
+        uint8_t _alert_for_failure = 0; \
+        EXPECT_SUCCESS(s2n_error_get_alert(s2n_errno, &_alert_for_failure)); \
+        EXPECT_EQUAL(_alert_for_failure, (alert)); \
+        RESET_ERRNO(); \
+    } while(0)
+
 /* for use with S2N_RESULT */
 #define EXPECT_ERROR_WITH_ERRNO_NO_RESET( function_call, err ) \
     do { \
@@ -187,7 +197,7 @@ int test_count;
             fprintf(stderr, "s2nd failed to enter FIPS mode with RC: %lu; String: %s\n", fips_rc, ERR_error_string(fips_rc, ssl_error_buf)); \
             return 1; \
         } \
-        printf("s2nd entered FIPS mode\n"); \
+        printf("s2n entered FIPS mode\n"); \
     } while (0)
 
 #else
@@ -201,8 +211,8 @@ int test_count;
     do {                                                                       \
         __typeof(n) __tmp_n = (n);                                             \
         if (__tmp_n) {                                                         \
-            if (memcpy((d), (s), (__tmp_n)) == NULL) {                         \
-                FAIL_MSG(#d "is NULL, memcpy() failed");                       \
+            if (memmove((d), (s), (__tmp_n)) == NULL) {                         \
+                FAIL_MSG(#d "is NULL, memmove() failed");                       \
             }                                                                  \
         }                                                                      \
     } while (0)

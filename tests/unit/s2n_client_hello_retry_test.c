@@ -43,7 +43,7 @@ int main(int argc, char **argv)
         END_TEST();
     }
 
-    EXPECT_SUCCESS(s2n_enable_tls13());
+    EXPECT_SUCCESS(s2n_enable_tls13_in_test());
 
     /* Test s2n_server_hello_retry_recv */
     {
@@ -588,14 +588,14 @@ int main(int argc, char **argv)
     }
 
     /* Test s2n_hello_retry_validate raises a S2N_ERR_INVALID_HELLO_RETRY error when
-     * when conn->secrets.server_random is not set to the correct hello retry random value
+     * when conn->handshake_params.server_random is not set to the correct hello retry random value
      * specified in the RFC: https://tools.ietf.org/html/rfc8446#section-4.1.3 */
     {
         struct s2n_connection *conn;
         EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_CLIENT));
         /* From RFC: https://tools.ietf.org/html/rfc8446#section-4.1.3 */
         const uint8_t not_hello_retry_request_random[S2N_TLS_RANDOM_DATA_LEN] = { 0 };
-        EXPECT_MEMCPY_SUCCESS(conn->secrets.server_random, not_hello_retry_request_random,
+        EXPECT_MEMCPY_SUCCESS(conn->handshake_params.server_random, not_hello_retry_request_random,
                               S2N_TLS_RANDOM_DATA_LEN);
 
         EXPECT_FAILURE_WITH_ERRNO(s2n_hello_retry_validate(conn), S2N_ERR_INVALID_HELLO_RETRY);
@@ -634,7 +634,7 @@ int main(int argc, char **argv)
         EXPECT_SUCCESS(s2n_connection_free(client_conn));
     }
 
-    EXPECT_SUCCESS(s2n_disable_tls13());
+    EXPECT_SUCCESS(s2n_disable_tls13_in_test());
 
     END_TEST();
 }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

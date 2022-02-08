@@ -89,8 +89,8 @@ static int s2n_check_traffic_secret_order(void* context, struct s2n_connection *
 static S2N_RESULT s2n_setup_tls13_secrets_prereqs(struct s2n_connection *conn)
 {
     conn->secure.cipher_suite = &s2n_tls13_aes_128_gcm_sha256;
-    RESULT_GUARD_POSIX(s2n_tls13_conn_copy_hash(conn, &conn->handshake.hashes->server_hello_copy));
-    RESULT_GUARD_POSIX(s2n_tls13_conn_copy_hash(conn, &conn->handshake.hashes->server_finished_copy));
+    RESULT_GUARD(s2n_tls13_calculate_digest(conn, conn->handshake.hashes->server_hello_digest));
+    RESULT_GUARD(s2n_tls13_calculate_digest(conn, conn->handshake.hashes->server_finished_digest));
 
     const struct s2n_ecc_preferences *ecc_pref = NULL;
     RESULT_GUARD_POSIX(s2n_connection_get_ecc_preferences(conn, &ecc_pref));
@@ -553,7 +553,7 @@ int main()
             EXPECT_SUCCESS(s2n_tls13_handle_secrets(client_conn));
 
             /* Check early secret secret set correctly */
-            EXPECT_BYTEARRAY_EQUAL(client_conn->secrets.rsa_premaster_secret, early_secret.data, early_secret.size);
+            EXPECT_BYTEARRAY_EQUAL(client_conn->secrets.tls12.rsa_premaster_secret, early_secret.data, early_secret.size);
 
             /* Check IV calculated correctly */
             EXPECT_BYTEARRAY_EQUAL(client_conn->secure.client_implicit_iv, iv.data, iv.size);

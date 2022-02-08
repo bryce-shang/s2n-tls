@@ -77,9 +77,8 @@ typedef enum {
 
 typedef enum {
     S2N_ASYNC_NOT_INVOKED = 0,
-    S2N_ASYNC_INVOKING_CALLBACK,
-    S2N_ASYNC_INVOKED_WAITING,
-    S2N_ASYNC_INVOKED_COMPLETE,
+    S2N_ASYNC_INVOKED,
+    S2N_ASYNC_COMPLETE,
 } s2n_async_state;
 
 struct s2n_handshake_parameters {
@@ -128,6 +127,9 @@ struct s2n_handshake_parameters {
     struct s2n_cert_chain_and_key *wc_sni_matches[S2N_CERT_TYPE_COUNT];
     uint8_t exact_sni_match_exists;
     uint8_t wc_sni_match_exists;
+
+    uint8_t client_random[S2N_TLS_RANDOM_DATA_LEN];
+    uint8_t server_random[S2N_TLS_RANDOM_DATA_LEN];
 };
 
 struct s2n_handshake {

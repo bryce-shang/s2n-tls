@@ -39,7 +39,7 @@ static int s2n_read_server_key_share_hybrid_test_vectors(const struct s2n_kem_gr
 int main(int argc, char **argv)
 {
     BEGIN_TEST();
-    EXPECT_SUCCESS(s2n_enable_tls13());
+    EXPECT_SUCCESS(s2n_enable_tls13_in_test());
 
     /* Test s2n_server_key_share_send_check_ecdhe */
     {
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
 
     /* Test the s2n_server_key_share_extension.recv with HelloRetryRequest */
     {
-        EXPECT_SUCCESS(s2n_enable_tls13());
+        EXPECT_SUCCESS(s2n_enable_tls13_in_test());
         /* For a HelloRetryRequest, we won't have a key share. We just have the server selected group/negotiated curve.
          * Test that s2n_server_key_share_extension.recv obtains the server negotiate curve successfully. */
         {
@@ -475,7 +475,7 @@ int main(int argc, char **argv)
 
             server_conn->kex_params.server_ecc_evp_params.negotiated_curve = s2n_all_supported_curves_list[0];
             EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(server_conn));
-            EXPECT_MEMCPY_SUCCESS(server_conn->secrets.server_random, hello_retry_req_random, S2N_TLS_RANDOM_DATA_LEN);
+            EXPECT_MEMCPY_SUCCESS(server_conn->handshake_params.server_random, hello_retry_req_random, S2N_TLS_RANDOM_DATA_LEN);
             EXPECT_SUCCESS(s2n_server_key_share_extension.send(server_conn, key_share_extension));
 
             const struct s2n_ecc_preferences *ecc_preferences = NULL;
@@ -488,7 +488,7 @@ int main(int argc, char **argv)
             EXPECT_NULL(ecc_evp_params->evp_pkey);
 
             /* Setup the client to have received a HelloRetryRequest */
-            EXPECT_MEMCPY_SUCCESS(client_conn->secrets.server_random, hello_retry_req_random, S2N_TLS_RANDOM_DATA_LEN);
+            EXPECT_MEMCPY_SUCCESS(client_conn->handshake_params.server_random, hello_retry_req_random, S2N_TLS_RANDOM_DATA_LEN);
             EXPECT_SUCCESS(s2n_connection_set_all_protocol_versions(client_conn, S2N_TLS13));
             EXPECT_SUCCESS(s2n_set_connection_hello_retry_flags(client_conn));
             EXPECT_SUCCESS(s2n_set_hello_retry_required(client_conn));
@@ -504,7 +504,7 @@ int main(int argc, char **argv)
             EXPECT_SUCCESS(s2n_connection_free(server_conn));
             EXPECT_SUCCESS(s2n_connection_free(client_conn));
         }
-        EXPECT_SUCCESS(s2n_disable_tls13());
+        EXPECT_SUCCESS(s2n_disable_tls13_in_test());
     }
 
     {
@@ -572,7 +572,7 @@ int main(int argc, char **argv)
 
         /* Tests for s2n_server_key_share_extension.recv with hybrid PQ key shares */
         {
-            EXPECT_SUCCESS(s2n_enable_tls13());
+            EXPECT_SUCCESS(s2n_enable_tls13_in_test());
 
             /* If PQ is disabled, the client will not have sent PQ IDs/keyshares in the ClientHello;
              * if the server responded with a PQ keyshare, we should error. */
@@ -783,7 +783,7 @@ int main(int argc, char **argv)
                     }
                 }
             }
-            EXPECT_SUCCESS(s2n_disable_tls13());
+            EXPECT_SUCCESS(s2n_disable_tls13_in_test());
         }
 
         /* Test s2n_server_key_share_send_check_pq_hybrid */
