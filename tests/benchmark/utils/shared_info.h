@@ -39,4 +39,4 @@ void argument_parse(int argc, char** argv, int& use_corked_io, int& insecure, ch
                     std::string& file_prefix, long int& warmup_iters, size_t& iterations, size_t& repetitions,
                     std::string& gb_options, std::vector<int> &data_sizes);
 
-#define BENCH_TLS13 1
+// #define BENCH_TLS13 1
