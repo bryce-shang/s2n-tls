@@ -33,14 +33,14 @@
 /* Symbols for AES-SHA1-CBC composite ciphers were added in Openssl 1.0.1
  * These composite ciphers exhibit erratic behavior in LibreSSL releases.
  */
-#if S2N_OPENSSL_VERSION_AT_LEAST(1,0,1) || defined(OPENSSL_IS_AWSLC)
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,0,1)
 #define S2N_AES_SHA1_COMPOSITE_AVAILABLE
 #endif
 /* Symbols for AES-SHA256-CBC composite ciphers were added in Openssl 1.0.2
  * See https://www.openssl.org/news/cl102.txt
  * These composite ciphers exhibit erratic behavior in LibreSSL releases.
  */
-#if S2N_OPENSSL_VERSION_AT_LEAST(1,0,2) || defined(OPENSSL_IS_AWSLC)
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,0,2)
 #define S2N_AES_SHA256_COMPOSITE_AVAILABLE
 #endif
 
@@ -129,7 +129,7 @@ static int s2n_composite_cipher_aes_sha_initial_hmac(struct s2n_session_key *key
      * constants used below. This method should never be called with BoringSSL or AWS-LC because the isAvaliable checked
      * will fail. Instead of defining a possibly dangerous default or hard coding this to 0x16 error out with BoringSSL and AWS-LC.
      */
-#if defined(OPENSSL_IS_BORINGSSL) || defined(OPENSSL_IS_AWSLC)
+#if defined(OPENSSL_IS_BORINGSSL)
   POSIX_BAIL(S2N_ERR_NO_SUPPORTED_LIBCRYPTO_API);
 #else
     uint8_t ctrl_buf[S2N_TLS12_AAD_LEN];
